@@ -1,0 +1,141 @@
+﻿
+@{
+    Layout = null;
+}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<div class="container">
+    <div class="row" style="height:76vh">
+        <div class="col-lg-6 h-100 d-flex align-items-center">
+            <img class="img-fluid w-100 h-100" src="https://media.tenor.com/pSkzLUayMVEAAAAj/ekruut-sign-up.gif" width="200px" height="200px"></img>
+        </div>
+        <div class="col-lg-6">
+            <div class="mb-3" style="margin-top:100px">
+                <h3> Sign up</h3>
+                <h4>It's free and always will be.</h4>
+            </div>
+            <form class="needs-validation" novalidate>
+
+                <div class="row mb-2">
+                    <div class="col-lg-6">
+                        @* For Regular Expression validation Need to user Pattern attrubut in Controls like pattern="^\[A-Za-z]$" *@
+                        <input type="text" id="txtFirstname" class="form-control w-100" placeholder="First name" autofocus="" required="" />
+                        <div class="invalid-feedback">
+                            Please provide valid Frist Name
+                        </div>
+                        @*<div class="valid-feedback">
+                               Thannkis
+                            </div>*@
+                    </div>
+
+                    <div class="col-lg-6">
+                        <input type="text" id="txtLastname" class="form-control w-100" placeholder="Last name" autofocus="" required="" />
+                        <div class="invalid-feedback">
+                            Please provide valid Last Name
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-2">
+                    <div class="col-lg-6">
+                        <input type="number" id="phonenumber" class="form-control w-100" placeholder="Mobile Number" autofocus="" required="" />
+                        <div class="invalid-feedback">
+                            Please provide Phone Number
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <input type="email" id="emailaddress" class="form-control w-100" placeholder="Email Address" autofocus="" required="" />
+                        <div class="invalid-feedback">
+                            Please provide valid Email Address
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-2">
+                    <div class="col-lg-6">
+                        <input type="password" id="cpassword" class="form-control w-100" placeholder="Password" autofocus="" required="" />
+                    </div>
+                    <div class="col-lg-6">
+                        <input type="password" id="conpassword" class="form-control w-100" placeholder="Confirm Password" autofocus="" required="" />
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end g-2 w-100">
+                    <p>if you have an account? <a href="/User/Login">SignIn/Login</a></p>
+                </div>
+
+                <div class="d-flex justify-content-end g-2 w-100">
+                    <div><button class="btn btn-warning" type="button" onclick="resetuserdata()">Reset</button></div>
+                    <div style="margin-left:5px"><button class="btn btn-primary" type="button" onclick="validateNSignup()">Sign up</button></div>
+                </div>
+            </form>
+
+        </div>
+
+    </div>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script type="text/javascript">
+
+    function validateNSignup() {
+        var form = document.querySelector('.needs-validation'); // single form
+
+        if (!form.checkValidity()) {
+            event.preventDefault()
+            event.stopPropagation()
+            form.classList.add('was-validated'); // show Bootstrap styles
+            return false; // stop further action
+        }
+        var fname = $("#txtFirstname").val();
+        var lname = $("#txtLastname").val();
+        var phnum = $("#phonenumber").val();
+        var eml = $("#emailaddress").val();
+        var pass = $("#cpassword").val();
+        var conpass = $("#conpassword").val();
+        if (pass != conpass) {
+            alert("Password Mismatch");
+            return false;
+        }
+        $.ajax({
+            type: "POST",
+            url: '/User/InsertUserDetails',
+            data: JSON.stringify({
+                firstname: fname,
+                lastname: lname,
+                mobilenumber: phnum,
+                email: eml,
+                password: pass
+            }),
+            contentType: "application/json; charset=utf-8",
+            success: function (response) {
+                if (response.success) {
+                    alert(response.message);
+                    resetuserdata();
+                    window.location.href = "/User/Login";
+
+                } else {
+                    alert("Error while saving  data.");
+                }
+            },
+            error: function () {
+                alert("Server error.");
+            }
+        });
+    }
+
+    function resetuserdata() {
+        var form = document.querySelector('.needs-validation');
+        form.classList.remove('was-validated');
+        $("#txtFirstname").val('');
+        $("#txtLastname").val('');
+        $("#phonenumber").val('');
+        $("#emailaddress").val('');
+        $("#cpassword").val('');
+        $("#conpassword").val('');
+    }
+
+
+
+</script>

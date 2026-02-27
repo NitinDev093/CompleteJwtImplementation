@@ -18,7 +18,7 @@ namespace CompleteJwtImplementation.Filters
 
             try
             {
-                string token = JWTHelper.GetTokenFromHeader();
+                string token = JWTHelper.GetTokenFromRequest();
                 // Token missing
                 if (string.IsNullOrEmpty(token))
                 {

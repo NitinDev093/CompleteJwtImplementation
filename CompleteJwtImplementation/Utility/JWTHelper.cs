@@ -1,6 +1,7 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -11,7 +12,7 @@ namespace CompleteJwtImplementation.Utility
 {
     public class JWTHelper
     {
-        private static string SecretKey = "ThisIsMySecretKey12345";
+        private static string SecretKey = "ThisIsMySecretKey12345scsdfhjxzczxvxnhgkjlufgbxc";
         private static string Issuer = "JobPortalAPI";
         private static string Audience = "JobPortalUsers";
         private static int ExpireMinutes = 60;
@@ -21,16 +22,18 @@ namespace CompleteJwtImplementation.Utility
         // ===============================
         public static string GenerateToken(DataTable userModel, int expiryTime = 60)
         {
-            
-            string userdata = JsonConvert.SerializeObject(userModel);
+            var row = userModel.Rows[0];
+            var claims = new List<Claim>
+            {
+                new Claim("UserId", row["userid"].ToString()),
+                new Claim(ClaimTypes.Email, row["email"].ToString()),
+                new Claim(ClaimTypes.Name, row["firstname"].ToString() + " " + row["lastname"].ToString())
+            };
             var symmetricKey = Encoding.UTF8.GetBytes(SecretKey);
             var tokenHandler = new JwtSecurityTokenHandler();
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(new[]
-                {
-                    new Claim(ClaimTypes.Name, userdata)
-                }),
+                Subject = new ClaimsIdentity(claims),
                 Expires = DateTime.UtcNow.AddMinutes(expiryTime),
                 Issuer = Issuer,
                 Audience = Audience,
@@ -65,14 +68,21 @@ namespace CompleteJwtImplementation.Utility
         }
 
         // ===============================
-        // GET TOKEN FROM HEADER
+        // GET TOKEN FROM HEADER OR COOKIES
         // ===============================
-        public static string GetTokenFromHeader()
+        public static string GetTokenFromRequest()
         {
             var authHeader = HttpContext.Current.Request.Headers["Authorization"];
-            if (string.IsNullOrEmpty(authHeader))
-                return null;
-            return authHeader.Replace("Bearer ", "");
+            if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer "))
+            {
+                return authHeader.Substring("Bearer ".Length);
+            }
+            var cookie = HttpContext.Current.Request.Cookies["jwtToken"];
+            if (cookie != null)
+            {
+                return cookie.Value;
+            }
+            return null;
         }
 
         // ===============================
@@ -86,7 +96,7 @@ namespace CompleteJwtImplementation.Utility
         }
 
         // ===============================
-        // GET USER DATA (JSON) FROM TOKEN
+        // GET USER DATA FROM TOKEN
         // ===============================
         public static string GetUserId(string token)
         {
@@ -98,6 +108,12 @@ namespace CompleteJwtImplementation.Utility
         {
             var principal = ValidateToken(token);
             return principal.FindFirst(ClaimTypes.Email)?.Value;
+        }
+
+        public static string GetUserName(string token)
+        {
+            var principal = ValidateToken(token);
+            return principal.FindFirst(ClaimTypes.Name)?.Value;
         }
     }
 }
