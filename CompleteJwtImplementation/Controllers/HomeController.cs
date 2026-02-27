@@ -20,8 +20,12 @@ namespace CompleteJwtImplementation.Controllers
 
         public ActionResult About()
         {
-            ViewBag.Message = "Your application description page.";
+            return View();
+        }
 
+        public ActionResult AddParentDetails(string fatherName,string motherName)
+        {
+            string token = JWTHelper.GetTokenFromRequest();
             return View();
         }
 

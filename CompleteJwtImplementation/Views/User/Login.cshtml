@@ -46,8 +46,6 @@
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script type="text/javascript">
 
-    
-
     function validateNLogin() {
         var form = document.querySelector('.needs-validation'); // single form
         if (!form.checkValidity()) {
@@ -69,7 +67,7 @@
             success: function (response) {
                 if (response.success) {
                     alert(response.message);
-                    /*localStorage.setItem("jwtToken", response.data);*/
+                    localStorage.setItem("jwtToken", response.data);
                     window.location.href = "/Home/Index";
                 }
             },

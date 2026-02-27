@@ -1,9 +1,48 @@
 ﻿@{
     ViewBag.Title = "About";
 }
-<main aria-labelledby="title">
-    <h2 id="title">@ViewBag.Title.</h2>
-    <h3>@ViewBag.Message</h3>
 
-    <p>Use this area to provide additional information.</p>
-</main>
+<div class="container mt-5">
+    <h3>Parent Details Form</h3>
+    <form id="parentForm">
+        <div class="mb-3">
+            <label for="fatherName" class="form-label">Father Name</label>
+            <input type="text" class="form-control" id="fatherName" name="fatherName" placeholder="Enter Father Name" required>
+        </div>
+        <div class="mb-3">
+            <label for="motherName" class="form-label">Mother Name</label>
+            <input type="text" class="form-control" id="motherName" name="motherName" placeholder="Enter Mother Name" required>
+        </div>
+        <button type="button" class="btn btn-primary" onclick="addparentdetails()">Submit</button>
+    </form>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script type="text/javascript">
+
+    function addparentdetails() {
+        var fname = $("#fatherName").val();
+        var mname = $("#motherName").val();
+        var token = localStorage.getItem("jwtToken"); 
+        $.ajax({
+            type: "POST",
+            url: "/Home/AddParentDetails",
+            headers: {
+                "Authorization": "Bearer " + token
+            },
+            data: {
+                fatherName: fname,
+                motherName: mname
+            },
+            success: function (response) {
+                alert(response);
+            },
+            error: function (error) {
+                console.error("Error:", error);
+                alert("An error occurred while submitting the form.");
+            }
+        });
+    }
+
+
+</script>
